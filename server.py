@@ -13,6 +13,8 @@ app.jinja_env.undefined = StrictUndefined
 def homepage():
     """View homepage."""
 
+    
+
     return render_template('homepage.html')
 
 @app.route('/movies')
@@ -46,7 +48,7 @@ def user_detail(user_id):
 
     return render_template('user_detail.html', user = user)
 
-@app.route('/users', methods=['POST'])
+@app.route('/register', methods=['POST'])
 def register_user():
     """Create a new user"""
     email = request.form.get('email')
@@ -57,9 +59,27 @@ def register_user():
         flash('Cannot create an account with that email.  Try again.')
     else:
         crud.create_user(email, password)
-        flash('Account create! Please log in.')
+        flash('Account created! Please log in.')
 
     return redirect('/')
+
+@app.route('/login', methods=['POST'])
+def login_user():
+    """Login a new user"""
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    user = crud.get_user_by_email(email)
+    if user:
+        if user.email == email and user.password == password:
+            session['user_id'] = user.user_id
+            flash('Logged In!')
+    else:
+    
+        flash('Invalid user and password combination')
+
+    return redirect('/')
+
 
 
 if __name__ == '__main__':
